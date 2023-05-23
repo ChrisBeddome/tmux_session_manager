@@ -1,0 +1,65 @@
+#!/bin/bash
+
+if ! command -v tmux >/dev/null || ! command -v grep >/dev/null; then
+  echo "Required commands (tmux, grep) are missing. Please install them."
+  exit 1
+fi
+
+is_active_session() {
+  [[ "$(tmux display-message -p '#S')" == "$session_name" ]]
+}
+
+is_attached() {
+  tmux ls | grep -q attached
+}
+
+switch_or_attach() {
+  if is_attached; then
+    tmux switch-client -t $session_name    
+  else 
+    tmux attach -t $session_name
+  fi
+}
+
+session_exists() {
+  tmux ls | grep -q "$session_name"
+}
+
+ssh_agent_missing() {
+  [ -z "$SSH_AUTH_SOCK" ]
+}
+
+setup_ssh_agent() {
+  eval "$(ssh-agent -s)"
+  ssh-add
+}
+ensure_ssh_agent() {
+  if ssh_agent_missing; then
+    setup_ssh_agent
+  fi
+}
+
+server_running() {
+  tmux has-session 2>/dev/null
+}
+
+main() {
+  if ! server_running; then
+    ensure_ssh_agent
+    create_session
+    tmux attach -t $session_name
+    exit
+  fi
+
+  if is_attached && is_active_session; then
+    echo "Already attached to ${session_name}"
+    exit
+  fi
+
+  if ! session_exists; then
+    ensure_ssh_agent
+    create_session
+  fi
+
+  switch_or_attach
+}
