@@ -13,13 +13,13 @@ work_directory="~/development/rickety_stool_store"
 
 create_session() {
   tmux new-session -d -s "$session_name"
-  tmux rename-window 'vim'
-  tmux send-keys "cd ${work_directory}/" C-m
-  tmux send-keys 'vim' C-m
-  tmux new-window
-  tmux send-keys "cd ${work_directory}/projects" C-m
-  tmux rename-window 'todos'
-  tmux send-keys "cat todos.txt"
+  tmux rename-window -t "$session_name 'vim'
+  tmux send-keys -t "$session_name" cd ${work_directory}/" C-m
+  tmux send-keys -t "$session_name" 'vim' C-m
+  tmux new-window -t "$session_name" 
+  tmux send-keys -t "$session_name" "cd ${work_directory}/projects" C-m
+  tmux rename-window -t "$session_name" 'todos'
+  tmux send-keys -t "$session_name" "cat todos.txt"
   tmux select-window -t vim
 }
 
