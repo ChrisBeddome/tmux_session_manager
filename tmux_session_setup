@@ -45,7 +45,9 @@ server_running() {
 
 main() {
   if ! server_running; then
-    ensure_ssh_agent
+    if [ "$1" -eq 1 ]; then
+      ensure_ssh_agent
+    fi
     create_session
     tmux attach -t $session_name
     exit
@@ -57,7 +59,9 @@ main() {
   fi
 
   if ! session_exists; then
-    ensure_ssh_agent
+    if [ "$1" -eq 1 ]; then
+      ensure_ssh_agent
+    fi
     create_session
   fi
 
