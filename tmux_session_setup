@@ -1,7 +1,12 @@
 #!/bin/bash
 
-if ! command -v tmux >/dev/null || ! command -v grep >/dev/null; then
-  echo "Required commands (tmux, grep) are missing. Please install them."
+if ! command -v tmux >/dev/null
+  echo "Missing dependencies: tmux."
+  exit 1
+fi
+
+if ! command -v grep >/dev/null; then
+  echo "Missing dependencies: grep."
   exit 1
 fi
 
@@ -44,8 +49,9 @@ server_running() {
 }
 
 main() {
+  local ssh_wrap="${1:-0}"
   if ! server_running; then
-    if [ "$1" -eq 1 ]; then
+    if [ "$ssh_wrap" -eq 1 ]; then
       ensure_ssh_agent
     fi
     create_session
@@ -59,7 +65,7 @@ main() {
   fi
 
   if ! session_exists; then
-    if [ "$1" -eq 1 ]; then
+    if [ "$ssh_wrap" -eq 1 ]; then
       ensure_ssh_agent
     fi
     create_session
