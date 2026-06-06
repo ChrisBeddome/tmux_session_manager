@@ -13,7 +13,7 @@ if ! command -v grep >/dev/null; then
 fi
 
 is_active_session() {
-  [[ -n "$TMUX" ]] && [[ "$(tmux display-message -p '#S' 2>/dev/null)" == "$session_name" ]]
+  [[ "$(tmux display-message -p '#S')" == "$session_name" ]]
 }
 
 is_attached() {
@@ -50,14 +50,7 @@ server_running() {
   tmux has-session 2>/dev/null
 }
 
-drain_terminal_responses() {
-  # Absorb any pending terminal capability responses (DA1/DA2 queries)
-  read -rs -t 0.1 -n 1000 2>/dev/null || true
-  stty sane 2>/dev/null || true
-}
-
 main() {
-  drain_terminal_responses
   if [[ -n "$1" ]]; then
     ssh_key_path="$1"
   fi
