@@ -1,7 +1,5 @@
 #!/bin/bash
 
-ssh_key_path=""
-
 if ! command -v tmux >/dev/null; then
   echo "Missing dependencies: tmux."
   exit 1
@@ -32,32 +30,12 @@ session_exists() {
   tmux ls | grep -q "$session_name"
 }
 
-ssh_agent_missing() {
-  [ -z "$SSH_AUTH_SOCK" ]
-}
-
-setup_ssh_agent() {
-  eval "$(ssh-agent -s)"
-  ssh-add $ssh_key_path
-}
-ensure_ssh_agent() {
-  if ssh_agent_missing; then
-    setup_ssh_agent
-  fi
-}
-
 server_running() {
   tmux has-session 2>/dev/null
 }
 
 main() {
-  if [[ -n "$1" ]]; then
-    ssh_key_path="$1"
-  fi
   if ! server_running; then
-    if [[ -n "$ssh_key_path" ]]; then
-      ensure_ssh_agent
-    fi
     create_session
     tmux attach -t $session_name
     exit
@@ -69,9 +47,6 @@ main() {
   fi
 
   if ! session_exists; then
-    if [[ -n "$ssh_key_path" ]]; then
-      ensure_ssh_agent
-    fi
     create_session
   fi
 
