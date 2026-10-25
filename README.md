@@ -1,5 +1,5 @@
 # tmux_session_manager
-simple bash script to spawn pre-configured tmux sessions and easily swap between them. The tmux session is wrapped in an ssh-agent if a valid ssh keypath is passed to main
+simple bash script to spawn pre-configured tmux sessions and easily swap between them.
 
 The code here expects that the calling code has a `session_name` variable and a `create_session` method defined. A simple example:
 
@@ -23,5 +23,5 @@ create_session() {
   tmux select-window -t vim
 }
 
-main "path/to/ssh/key"
+main
 ```
